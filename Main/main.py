@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-import gui.app_ui
+from gui import layout_adjuster
 
-gui.app_ui.process()
+if __name__ == '__main__':
+    layout_adjuster.process()
 
 
