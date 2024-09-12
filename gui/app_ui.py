@@ -57,7 +57,7 @@ class Ui_MainWindow(object):
         self.label_ThongKe = QtWidgets.QLabel(self.frame_TKe)
         self.label_ThongKe.setGeometry(QtCore.QRect(60, 360, 321, 91))
         font = QtGui.QFont()
-        font.setPointSize(50)
+        font.setPointSize(30)
         self.label_ThongKe.setFont(font)
         self.label_ThongKe.setStyleSheet("background-color:white;\n"
 "margin: -10px;")
@@ -84,7 +84,7 @@ class Ui_MainWindow(object):
         self.label_Ddanh = QtWidgets.QLabel(self.frame_DDanh)
         self.label_Ddanh.setGeometry(QtCore.QRect(60, 360, 341, 81))
         font = QtGui.QFont()
-        font.setPointSize(50)
+        font.setPointSize(30)
         self.label_Ddanh.setFont(font)
         self.label_Ddanh.setStyleSheet("background-color:white;\n"
 "margin: -10px;")
