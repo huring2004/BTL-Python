@@ -44,7 +44,8 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(20)
         self.pushButton_KetThuc.setFont(font)
-        self.pushButton_KetThuc.setStyleSheet("color: white;")
+        self.pushButton_KetThuc.setStyleSheet("color: white;\n"
+"background-color: transparent;")
         self.pushButton_KetThuc.setObjectName("pushButton_KetThuc")
         self.frame_TKe = QtWidgets.QFrame(self.centralwidget)
         self.frame_TKe.setGeometry(QtCore.QRect(121, 158, 440, 470))
