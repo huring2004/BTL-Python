@@ -108,6 +108,13 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
+        self.pushButton_KetThuc.hide()
+        self.pushButton_KetThuc.clicked.connect(self.frame_TKe.show)  # type: ignore
+        self.pushButton_KetThuc.clicked.connect(self.frame_DDanh.show)  # type: ignore
+        self.pushButton_KetThuc.clicked.connect(self.pushButton_KetThuc.hide)  # type: ignore
+        self.pushButtonDiemDanh.clicked.connect(self.pushButton_KetThuc.show)  # type: ignore
+        self.pushButtonDiemDanh.clicked.connect(self.frame_DDanh.hide)  # type: ignore
+        self.pushButtonDiemDanh.clicked.connect(self.frame_TKe.hide)  # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
