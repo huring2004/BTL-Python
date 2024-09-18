@@ -1,4 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+import cv2
 
 
 class Ui_MainWindow(object):
@@ -102,6 +103,22 @@ class Ui_MainWindow(object):
         self.pushButtonDiemDanh.setStyleSheet("background-color: transparent;")
         self.pushButtonDiemDanh.setText("")
         self.pushButtonDiemDanh.setObjectName("pushButtonDiemDanh")
+
+        # graphicView để hiển thị camera
+        self.viewCamera = QtWidgets.QGraphicsView(self.centralwidget)
+        self.viewCamera.setGeometry(QtCore.QRect(0, self.frameVienDo.height(), 1366, 667))
+        self.viewCamera.setStyleSheet("background-color: transparent;")
+        self.viewCamera.setObjectName("viewCamera")
+        self.viewCamera.hide()
+
+        # scene để hiển thị camera lên
+        self.scene = QtWidgets.QGraphicsScene()
+        self.viewCamera.setScene(self.scene)
+
+        # bring front tke, ddanh
+        self.frame_TKe.raise_()
+        self.frame_DDanh.raise_()
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -115,11 +132,52 @@ class Ui_MainWindow(object):
         self.pushButtonDiemDanh.clicked.connect(self.pushButton_KetThuc.show)  # type: ignore
         self.pushButtonDiemDanh.clicked.connect(self.frame_DDanh.hide)  # type: ignore
         self.pushButtonDiemDanh.clicked.connect(self.frame_TKe.hide)  # type: ignore
+        self.pushButton_KetThuc.clicked.connect(self.viewCamera.hide)  # hiển thị graphicView
+        self.pushButtonDiemDanh.clicked.connect(self.viewCamera.show)  # đóng graphicView
+        self.pushButtonDiemDanh.clicked.connect(self.openCamera)  # bật camera
+        self.pushButton_KetThuc.clicked.connect(self.closeCamera)  # đóng camera
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    #Mở camera dùng opencv
+    def openCamera(self):
+        self.cap = cv2.VideoCapture(0)
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.update_frame)
+        self.timer.start(20)
+
+    #Update khung hình dùng opencv
+    def update_frame(self):
+        ret, frame = self.cap.read()
+        if ret:
+            # Chuyển đổi frame từ BGR (OpenCV) sang RGB (Qt)
+            height, width, _ = frame.shape
+            qimg = QtGui.QImage(frame.data, width, height, 3 * width, QtGui.QImage.Format_RGB888).rgbSwapped()
+            pixmap = QtGui.QPixmap.fromImage(qimg)
+
+            # Điều chỉnh pixmap cho vừa khít với QGraphicsView
+            self.scene.clear()  # Xóa scene trước khi hiển thị frame mới
+            self.scene.addPixmap(pixmap)
+
+            #self.viewCamera.fitInView(self.scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+
+            # Fit scene vào QGraphicsView, chấp nhận việc hình ảnh bị cắt
+            self.viewCamera.fitInView(self.scene.sceneRect(), QtCore.Qt.KeepAspectRatioByExpanding)
+
+    #Đóng camera dùng opencv
+    def closeCamera(self):
+        self.timer.stop()  # Dừng timer
+        self.cap.release()  # Giải phóng camera
+        self.cap = None
+
+    #Đóng với trường hợp tắt app
+    def closeEvent(self, event):
+        # Đóng camera khi thoát ứng dụng
+        self.cap.release()
+        event.accept()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Hệ thống điểm danh"))
         self.label_HTDD.setText(_translate("MainWindow", "Hệ thống điểm danh"))
         self.pushButton_KetThuc.setText(_translate("MainWindow", "Kết thúc"))
         self.label_ThongKe.setText(_translate("MainWindow", "Thống kê"))

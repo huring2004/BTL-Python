@@ -23,14 +23,6 @@ class MainWindow(QMainWindow):
         # self.old_screen_w = self.geometry().width()
         # self.old_screen_h = self.geometry().height()
 
-    # def load_image(self):
-    #     # Tải ảnh và đặt vào QLabel
-    #     pixmap = QPixmap("1.jpg")
-    #     self.uic.label.setPixmap(pixmap)
-
-    # def changeEvent(self, a0):
-    #     # print('Thay doi')
-
     def resizeEvent(self, event):
         # self.new_button_ratio()
         self.button_calculate()
@@ -89,6 +81,11 @@ class MainWindow(QMainWindow):
         self.uic.frame_TKe.setGeometry(self.new_x_button, self.new_y_button, Tke.width(), Tke.height())
         self.uic.frame_DDanh.setGeometry(self.new_x_button_1, self.new_y_button_1, Dd.width(), Dd.height())
         self.uic.pushButton_KetThuc.setGeometry(self.new_x_kthuc, self.new_y_kthuc, Kthuc.width(), Kthuc.height())
+
+        # resize graphicview
+        winW = self.geometry().width()
+        winH = self.geometry().height()
+        self.uic.viewCamera.setGeometry(0, self.uic.frameVienDo.height(), winW, winH - self.uic.frameVienDo.height())
 
     # def font_button(self):
     #     # Tạo font và áp dụng cho QPushButton
