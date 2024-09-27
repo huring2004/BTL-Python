@@ -1,6 +1,19 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import cv2
+import numpy as np
+import face_recognition
+import os
+import sys
+import pickle
+import cvzone
+from face_recognition import face_locations
+from pyparsing import withClass
+from gui import layout_adjuster
 
+file = open("Mahoa.p", "rb")
+enList = pickle.load(file)
+file.close()
+encode, stdIds = enList
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -140,28 +153,45 @@ class Ui_MainWindow(object):
 
     #Mở camera dùng opencv
     def openCamera(self):
+
         self.cap = cv2.VideoCapture(0)
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_frame)
-        self.timer.start(20)
+        self.timer.start(0)
+
 
     #Update khung hình dùng opencv
     def update_frame(self):
         ret, frame = self.cap.read()
-        if ret:
+        if True:
             # Chuyển đổi frame từ BGR (OpenCV) sang RGB (Qt)
-            height, width, _ = frame.shape
-            qimg = QtGui.QImage(frame.data, width, height, 3 * width, QtGui.QImage.Format_RGB888).rgbSwapped()
-            pixmap = QtGui.QPixmap.fromImage(qimg)
 
-            # Điều chỉnh pixmap cho vừa khít với QGraphicsView
-            self.scene.clear()  # Xóa scene trước khi hiển thị frame mới
-            self.scene.addPixmap(pixmap)
+            imgS = cv2.resize(frame, (0, 0), None, 0.25, 0.25)
+            imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
 
-            #self.viewCamera.fitInView(self.scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+            faceFrame = face_recognition.face_locations(imgS)
+            encodeFrame = face_recognition.face_encodings(imgS, faceFrame)
 
-            # Fit scene vào QGraphicsView, chấp nhận việc hình ảnh bị cắt
-            self.viewCamera.fitInView(self.scene.sceneRect(), QtCore.Qt.KeepAspectRatioByExpanding)
+            for e, f in zip(encodeFrame, faceFrame):
+                mat = face_recognition.compare_faces(encode, e)
+                faceDis = face_recognition.face_distance(encode, e)
+                matIdx = np.argmin(faceDis)  # chỉ số của thằng ảnh nhỏ nhất
+                if mat[matIdx]:
+                    y1, x2, y2, x1 = f
+                    y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
+                    bbox = x1, y1, x2 - x1, y2 - y1
+                    frame = cvzone.cornerRect(frame, bbox, rt=0)
+                    height, width, _ = frame.shape
+                    qimg = QtGui.QImage(frame.data, width, height, 3*width, QtGui.QImage.Format_RGB888).rgbSwapped()
+                    pixmap = QtGui.QPixmap.fromImage(qimg)
+
+                    # Điều chỉnh pixmap cho vừa khít với QGraphicsView
+                    self.scene.clear()  # Xóa scene trước khi hiển thị frame mới
+                    self.scene.addPixmap(pixmap)
+                    #self.viewCamera.fitInView(self.scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+
+                    # Fit scene vào QGraphicsView, chấp nhận việc hình ảnh bị cắt
+                    self.viewCamera.fitInView(self.scene.sceneRect(), QtCore.Qt.KeepAspectRatioByExpanding)
 
     #Đóng camera dùng opencv
     def closeCamera(self):
@@ -190,5 +220,6 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
-    MainWindow.show()
+    # MainWindow.show()
+    layout_adjuster.process()
     sys.exit(app.exec_())
