@@ -181,17 +181,17 @@ class Ui_MainWindow(object):
                     y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
                     bbox = x1, y1, x2 - x1, y2 - y1
                     frame = cvzone.cornerRect(frame, bbox, rt=0)
-                    height, width, _ = frame.shape
-                    qimg = QtGui.QImage(frame.data, width, height, 3*width, QtGui.QImage.Format_RGB888).rgbSwapped()
-                    pixmap = QtGui.QPixmap.fromImage(qimg)
+            height, width, _ = frame.shape
+            qimg = QtGui.QImage(frame.data, width, height, 3*width, QtGui.QImage.Format_RGB888).rgbSwapped()
+            pixmap = QtGui.QPixmap.fromImage(qimg)
 
                     # Điều chỉnh pixmap cho vừa khít với QGraphicsView
-                    self.scene.clear()  # Xóa scene trước khi hiển thị frame mới
-                    self.scene.addPixmap(pixmap)
+            self.scene.clear()  # Xóa scene trước khi hiển thị frame mới
+            self.scene.addPixmap(pixmap)
                     #self.viewCamera.fitInView(self.scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
                     # Fit scene vào QGraphicsView, chấp nhận việc hình ảnh bị cắt
-                    self.viewCamera.fitInView(self.scene.sceneRect(), QtCore.Qt.KeepAspectRatioByExpanding)
+            self.viewCamera.fitInView(self.scene.sceneRect(), QtCore.Qt.KeepAspectRatioByExpanding)
 
     #Đóng camera dùng opencv
     def closeCamera(self):
