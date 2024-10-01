@@ -179,8 +179,14 @@ class Ui_MainWindow(object):
                 if mat[matIdx]:
                     y1, x2, y2, x1 = f
                     y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
-                    bbox = x1, y1, x2 - x1, y2 - y1
-                    frame = cvzone.cornerRect(frame, bbox, rt=0)
+                    name, msv= map(str,stdIds[matIdx].split("-"))
+                    name = f"Ten: {name}"
+                    msv = f"MSV: {msv}"
+
+                    cv2.rectangle(frame,(x1,y1),(x2,y2),(0,255,0),1)
+                    cv2.rectangle(frame,(x1,y2-30),(x2,y2),(0,225,0),cv2.FILLED)
+                    cv2.putText(frame,name,(x1+6,y2-15), cv2.FONT_HERSHEY_COMPLEX,0.35,(255,255,255),1)
+                    cv2.putText(frame,msv,(x1+6,y2-2), cv2.FONT_HERSHEY_COMPLEX,0.35,(255,255,255),1)
             height, width, _ = frame.shape
             qimg = QtGui.QImage(frame.data, width, height, 3*width, QtGui.QImage.Format_RGB888).rgbSwapped()
             pixmap = QtGui.QPixmap.fromImage(qimg)
