@@ -18,8 +18,10 @@ enList = pickle.load(file)
 file.close()
 encode, stdIds = enList
 
-
-
+# variable globol
+mp = {}
+r1,g1,b1 = 0,255,0
+r2,g2,b2 = 255,255,255
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -177,6 +179,7 @@ class Ui_MainWindow(object):
 
     # them vào file điểm danh
     def diemdanh(self, id):
+        global r1, g1, b1,r2, g2, b2
         with open("../Backend/DiemDanh.csv", "r+") as f:
             name, msv = map(str, id.split("-"))
             myDD = f.readlines()
@@ -186,8 +189,15 @@ class Ui_MainWindow(object):
                 list_msv.append(t[1])
             if msv not in list_msv:
                 now = datetime.today()
-                _time = now.strftime("%H:%M:%S %d-%m-%Y")
+                _time = now.strftime("%H:%M:%S-%d/%m/%Y")
                 f.writelines(f"\n{name}, {msv}, {_time}")
+                mp[msv]=1
+            else : mp[msv]+=1
+            if(mp[msv] == 3):
+                r1, g1, b1 = 0, 0,255
+                r2, g2, b2 = 255, 255, 255
+
+
     #Update khung hình dùng opencv
 
     def update_frame(self):
@@ -213,10 +223,18 @@ class Ui_MainWindow(object):
                     name = f"Ten: {name}"
                     msv = f"MSV: {msv}"
                     self.diemdanh(str(stdIds[matIdx]))
-                    cv2.rectangle(frame,(x1,y1),(x2,y2),(0,255,0),1)
-                    cv2.rectangle(frame,(x1,y2-30),(x2,y2),(0,225,0),cv2.FILLED)
-                    cv2.putText(frame,name,(x1+6,y2-15), cv2.FONT_ITALIC,0.35,(255,255,255),1)
-                    cv2.putText(frame,msv,(x1+6,y2-2), cv2.FONT_ITALIC,0.35,(255,255,255),1)
+                    cv2.rectangle(frame,(x1,y1),(x2,y2),(r1,g1,b1),1)
+                    # cv2.rectangle(frame,(x1,y2-30),(x2,y2),(0,225,0),cv2.FILLED)
+
+                    #làm đẹp 1 tý
+                    color = (r1, g1, b1)
+                    alpha = 0.35
+                    overlay = frame.copy()
+                    cv2.rectangle(overlay, (x1, y2+30), (x2, y2), color, cv2.FILLED)
+                    # Kết hợp overlay với frame bằng alpha blending
+                    cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
+                    cv2.putText(frame,name,(x1+6,y2-15+30), cv2.FONT_ITALIC,0.35,(r2,g2,b2),1)
+                    cv2.putText(frame,msv,(x1+6,y2-2+30), cv2.FONT_ITALIC,0.35,(r2,g2,b2),1)
 
             height, width, _ = frame.shape
             qimg = QtGui.QImage(frame.data, width, height, 3*width, QtGui.QImage.Format_RGB888).rgbSwapped()
