@@ -1,3 +1,6 @@
+from datetime import datetime
+from itertools import count
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 import cv2
 import numpy as np
@@ -14,6 +17,9 @@ file = open("Mahoa.p", "rb")
 enList = pickle.load(file)
 file.close()
 encode, stdIds = enList
+
+
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -147,6 +153,7 @@ class Ui_MainWindow(object):
         self.pushButtonDiemDanh.clicked.connect(self.frame_TKe.hide)  # type: ignore
         self.pushButton_KetThuc.clicked.connect(self.viewCamera.hide)  # hiển thị graphicView
         self.pushButtonDiemDanh.clicked.connect(self.viewCamera.show)  # đóng graphicView
+        self.pushButtonDiemDanh.clicked.connect(self.deleteContent)  # xóa nội dung trong file DiemDanh
         self.pushButtonDiemDanh.clicked.connect(self.openCamera)  # bật camera
         self.pushButton_KetThuc.clicked.connect(self.closeCamera)  # đóng camera
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -158,11 +165,29 @@ class Ui_MainWindow(object):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_frame)
         self.timer.start(0)
+    # delete nội dung trong file DiemDanh
+    def deleteContent(self):
+        with open("../Backend/DiemDanh.csv", "w") as f:
+            f.writelines("HoVaTen, MaSinhVien, ThoiGianDiemDanh")
 
-
+    # them vào file điểm danh
+    def diemdanh(self, id):
+        with open("../Backend/DiemDanh.csv", "r+") as f:
+            name, msv = map(str, id.split("-"))
+            myDD = f.readlines()
+            list_msv = []
+            for i in myDD:
+                t = i.split(", ")
+                list_msv.append(t[1])
+            if msv not in list_msv:
+                now = datetime.today()
+                _time = now.strftime("%H:%M:%S %d-%m-%Y")
+                f.writelines(f"\n{name}, {msv}, {_time}")
     #Update khung hình dùng opencv
+
     def update_frame(self):
         ret, frame = self.cap.read()
+
         if True:
             # Chuyển đổi frame từ BGR (OpenCV) sang RGB (Qt)
 
@@ -176,17 +201,18 @@ class Ui_MainWindow(object):
                 mat = face_recognition.compare_faces(encode, e)
                 faceDis = face_recognition.face_distance(encode, e)
                 matIdx = np.argmin(faceDis)  # chỉ số của thằng ảnh nhỏ nhất
-                if mat[matIdx]:
+                if  mat[matIdx]:
                     y1, x2, y2, x1 = f
                     y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
                     name, msv= map(str,stdIds[matIdx].split("-"))
                     name = f"Ten: {name}"
                     msv = f"MSV: {msv}"
-
+                    self.diemdanh(str(stdIds[matIdx]))
                     cv2.rectangle(frame,(x1,y1),(x2,y2),(0,255,0),1)
                     cv2.rectangle(frame,(x1,y2-30),(x2,y2),(0,225,0),cv2.FILLED)
-                    cv2.putText(frame,name,(x1+6,y2-15), cv2.FONT_HERSHEY_COMPLEX,0.35,(255,255,255),1)
-                    cv2.putText(frame,msv,(x1+6,y2-2), cv2.FONT_HERSHEY_COMPLEX,0.35,(255,255,255),1)
+                    cv2.putText(frame,name,(x1+6,y2-15), cv2.FONT_ITALIC,0.35,(255,255,255),1)
+                    cv2.putText(frame,msv,(x1+6,y2-2), cv2.FONT_ITALIC,0.35,(255,255,255),1)
+
             height, width, _ = frame.shape
             qimg = QtGui.QImage(frame.data, width, height, 3*width, QtGui.QImage.Format_RGB888).rgbSwapped()
             pixmap = QtGui.QPixmap.fromImage(qimg)
