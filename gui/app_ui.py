@@ -10,7 +10,7 @@ import sys
 import pickle
 import cvzone
 from face_recognition import face_locations
-from pyparsing import withClass
+# from pyparsing import withClass
 from gui import layout_adjuster
 
 file = open("Mahoa.p", "rb")
@@ -144,6 +144,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
+        self.pushButtonThongKe.clicked.connect(self.open_static_file)
         self.pushButton_KetThuc.hide()
         self.pushButton_KetThuc.clicked.connect(self.frame_TKe.show)  # type: ignore
         self.pushButton_KetThuc.clicked.connect(self.frame_DDanh.show)  # type: ignore
@@ -157,6 +158,10 @@ class Ui_MainWindow(object):
         self.pushButtonDiemDanh.clicked.connect(self.openCamera)  # bật camera
         self.pushButton_KetThuc.clicked.connect(self.closeCamera)  # đóng camera
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def open_static_file(self):
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Backend', 'DiemDanh.csv')
+        os.startfile(file_path)
 
     #Mở camera dùng opencv
     def openCamera(self):
@@ -247,11 +252,11 @@ class Ui_MainWindow(object):
 
 
 if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
+    # import sys
+    # app = QtWidgets.QApplication(sys.argv)
+    # MainWindow = QtWidgets.QMainWindow()
+    # ui = Ui_MainWindow()
+    # ui.setupUi(MainWindow)
     # MainWindow.show()
     layout_adjuster.process()
-    sys.exit(app.exec_())
+    # sys.exit(app.exec_())
