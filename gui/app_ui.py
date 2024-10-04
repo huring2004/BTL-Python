@@ -192,8 +192,10 @@ class Ui_MainWindow(object):
                 _time = now.strftime("%H:%M:%S-%d/%m/%Y")
                 f.writelines(f"\n{name}, {msv}, {_time}")
                 mp[msv]=1
+                r1, g1, b1 = 0, 255, 0
+                r2, g2, b2 = 255, 255, 255
             else : mp[msv]+=1
-            if(mp[msv] == 3):
+            if(mp[msv] > 3):
                 r1, g1, b1 = 0, 0,255
                 r2, g2, b2 = 255, 255, 255
 
@@ -235,6 +237,7 @@ class Ui_MainWindow(object):
                     cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
                     cv2.putText(frame,name,(x1+6,y2-15+30), cv2.FONT_ITALIC,0.35,(r2,g2,b2),1)
                     cv2.putText(frame,msv,(x1+6,y2-2+30), cv2.FONT_ITALIC,0.35,(r2,g2,b2),1)
+
 
             height, width, _ = frame.shape
             qimg = QtGui.QImage(frame.data, width, height, 3*width, QtGui.QImage.Format_RGB888).rgbSwapped()
