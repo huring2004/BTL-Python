@@ -11,10 +11,13 @@ class MainWindow(QMainWindow):
         super().__init__()
         # self.ratio_h = 1
         # self.ratio_w = 1
-        self.new_x_button_1 = None
         self.new_x_button = None
+        self.new_x_button_1 = None
+        self.new_x_button_2 = None
         self.new_y_button = None
         self.new_y_button_1 = None
+        self.new_y_button_2 = None
+
         self.new_x_kthuc = None
         self.new_y_kthuc = None
         self.uic = Ui_MainWindow()
@@ -42,26 +45,32 @@ class MainWindow(QMainWindow):
         new_screen_w = self.geometry().width()
         new_screen_h = self.geometry().height()
 
-        # calculate x coordinates of center button (tke + ddanh)
-        center_x_button = int(new_screen_w / 4 ) #Tke
-        center_x_button_1 = int(new_screen_w * 3 / 4) #Ddanh
+        # calculate x coordinates of center button (tke + ddanh + setting)
+        center_x_button = int(new_screen_w / 6 ) #Tke
+        center_x_button_1 = int(new_screen_w * 3 / 6) #Ddanh
+        center_x_button_2 = int(new_screen_w * 5 / 6) #Setting
 
-        #caculate y coordinates of center button (tke + ddanh)
+
+        #caculate y coordinates of center button (tke + ddanh + setting)
         vdo = self.uic.frameVienDo.geometry()
         center_y_button   = int((new_screen_h - vdo.height()) / 2) #Tke
         center_y_button_1 = int((new_screen_h - vdo.height()) / 2) #Ddanh
+        center_y_button_2 = int((new_screen_h - vdo.height()) / 2) #Setting
 
         # calculate new x,y button base on center button
-        self.new_button_pos(center_x_button, center_y_button, center_x_button_1, center_y_button_1)
+        self.new_button_pos(center_x_button, center_y_button, center_x_button_1, center_y_button_1, center_x_button_2, center_y_button_2)
 
-    def new_button_pos(self, center_x_button, center_y_button, center_x_button_1, center_y_button_1):
+    def new_button_pos(self, center_x_button, center_y_button, center_x_button_1, center_y_button_1, center_x_button_2, center_y_button_2):
         rect = self.uic.frame_TKe.geometry()
         self.new_x_button   = center_x_button   - rect.width() // 2
         self.new_x_button_1 = center_x_button_1 - rect.width() // 2
+        self.new_x_button_2 = center_x_button_2 - rect.width() // 2
+
 
         vdo = self.uic.frameVienDo.geometry()
         self.new_y_button   = center_y_button   - rect.height() // 2 + vdo.height()
         self.new_y_button_1 = center_y_button_1 - rect.height() // 2 + vdo.height()
+        self.new_y_button_2 = center_y_button_2 - rect.height() // 2 + vdo.height()
 
         #Pos button Ket thuc
         new_screen_w = self.geometry().width()
@@ -78,8 +87,10 @@ class MainWindow(QMainWindow):
         Tke   = self.uic.frame_TKe.geometry()
         Dd    = self.uic.frame_DDanh.geometry()
         Kthuc = self.uic.pushButton_KetThuc.geometry()
+        Setting = self.uic.frame_setting.geometry()
         self.uic.frame_TKe.setGeometry(self.new_x_button, self.new_y_button, Tke.width(), Tke.height())
         self.uic.frame_DDanh.setGeometry(self.new_x_button_1, self.new_y_button_1, Dd.width(), Dd.height())
+        self.uic.frame_setting.setGeometry(self.new_x_button_2, self.new_y_button_2, Setting.width(), Setting.height())
         self.uic.pushButton_KetThuc.setGeometry(self.new_x_kthuc, self.new_y_kthuc, Kthuc.width(), Kthuc.height())
 
         # resize graphicview
